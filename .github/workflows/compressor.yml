@@ -1,0 +1,43 @@
+name: Workflow
+
+on:
+    push:
+    workflow_dispatch:
+    
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+       - name: Checkout
+         uses: actions/checkout@main
+       
+       - name: initialization
+         continue-on-error: true
+         run: |
+           git config --global user.name ${{ secrets.GitHubName }}
+           git config --global user.email ${{ secrets.GitHubMail }}
+           git config --global credential.helper store
+           echo "https://mradulkumar-glitch:${{ secrets.GH_TOKEN }}@github.com" > ~/.git-credentials
+           
+       
+       - name: cloning repo
+         continue-on-error: true
+         run: |
+           git clone -b main https://mradulkumar-glitch:${{ secrets.GH_TOKEN }}@github.com/mradulkumar-glitch/Encoder.git
+       - name: Running Bot 
+         timeout-minutes: 350
+         continue-on-error: true
+         run: |
+           cd Encoder
+           docker build -t compressor . && docker run compressor
+           
+       - name: Loop workflow
+         continue-on-error: true
+         run: |
+           git clone https://${{ secrets.GH_TOKEN }}@github.com/${GITHUB_REPOSITORY} loop
+           cd loop || exit 1
+           echo $(( RANDOM - ( RANDOM % RANDOM ) )) > looper.txt
+           git add looper.txt
+           git commit -m "Workflow : Loop at $(date -u +%D-%T%P)"
+           git push -q https://${{ secrets.GH_TOKEN }}@github.com/${GITHUB_REPOSITORY} HEAD:main
