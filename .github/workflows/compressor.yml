@@ -28,7 +28,7 @@ jobs:
        - name: Running Bot 
          timeout-minutes: 350
          continue-on-error: true
-         run: 
+         run: |
            cd AiringAnimes
            docker build -t compressor . && docker run compressor
            
